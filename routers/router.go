@@ -10,7 +10,7 @@ package routers
 import (
 	"github.com/sena_2824182/pija_music_mid/controllers"
 
-	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 )
 
 func init() {
@@ -25,6 +25,11 @@ func init() {
 				&controllers.UserController{},
 			),
 		),
+		beego.NSNamespace("/Artista",
+		beego.NSInclude(
+			&controllers.ArtistaController{},
+		),
+	),
 	)
 	beego.AddNamespace(ns)
 }
