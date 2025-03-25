@@ -15,7 +15,7 @@ type AdministradorController struct {
 // @Title Create
 // @Description create Administrador
 // @Param	body		body 	models.Object	true		"The object content"
-// @Success 200 {string} models.Object.Id
+// @Success 200 {string} models.Admistrador.Id
 // @Failure 403 body is empty
 // @router / [post]
 func (o *AdministradorController) Post() {
