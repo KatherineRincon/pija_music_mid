@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"github.com/sena_2824182/pija_music_mid/models"
 	"encoding/json"
+
+	"github.com/sena_2824182/pija_music_mid/models"
 
 	"github.com/astaxie/beego"
 )
@@ -116,4 +117,3 @@ func (u *UserController) Logout() {
 	u.Data["json"] = "logout success"
 	u.ServeJSON()
 }
-
