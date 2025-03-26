@@ -37,9 +37,23 @@ func init() {
 		),
 		beego.NSNamespace("/Comida",
 			beego.NSInclude(
-				&controllers.CancionesController{},
+				&controllers.ComidaController{},
 			),
 		),
 	)
+
+	
+		beego.NSNamespace("/Cultura",
+			beego.NSInclude(
+				&controllers.CulturaController{},
+			),
+		),
+
+
+		beego.NSNamespace("/Trajes_tipicos",
+			beego.NSInclude(
+				&controllers.AdministradorController{},
+			),
+		),
 	beego.AddNamespace(ns)
 }
