@@ -3,8 +3,13 @@ package models
 import (
 	"time"
 
-	"github.com/astaxie/beego/orm"
 )
+
+type Alert struct {
+	Type string
+	Code string
+	Body interface{}
+}
 
 // Artista representa la tabla Artista en la base de datos
 type Artista struct {
@@ -20,36 +25,18 @@ type Artista struct {
 	UpdatedAt        time.Time `orm:"auto_now;type(datetime)"`      // Fecha de actualización
 }
 
-func AddArtista(artista *Artista) (int64, error) {
-	o := orm.NewOrm()
-	id, err := o.Insert(artista)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
+type User struct {
+	Id       string
+	Username string
+	Password string
+	Profile  Profile
 }
 
-func UpdateArtista(artista *Artista) error {
-	o := orm.NewOrm()
-	if _, err := o.Update(artista); err != nil {
-		return err
-	}
-	return nil
+type Profile struct {
+	Gender  string
+	Age     int
+	Address string
+	Email   string
 }
 
-func GetArtistaById(id int) (*Artista, error) {
-	o := orm.NewOrm()
-	artista := Artista{Id_Artista: id}
-	if err := o.Read(&artista); err != nil {
-		return nil, err
-	}
-	return &artista, nil
-}
 
-func DeleteArtista(id int) error {
-	o := orm.NewOrm()
-	if _, err := o.Delete(&Artista{Id_Artista: id}); err != nil {
-		return err
-	}
-	return nil
-}

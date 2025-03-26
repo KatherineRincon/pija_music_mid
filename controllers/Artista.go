@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"github.com/sena_2824182/pija_music_mid/models"
 	"encoding/json"
-	"github.com/tu_proyecto/mid/models"
+
 	"github.com/astaxie/beego"
+	"strconv"
 )
 
 // ArtistaController maneja las solicitudes relacionadas con artistas

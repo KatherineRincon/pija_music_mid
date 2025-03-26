@@ -3,7 +3,7 @@ module github.com/sena_2824182/pija_music_mid
 go 1.23.1
 
 require (
-	"github.com/astaxie/beego/orm" v1.12.3
+	github.com/astaxie/beego v1.12.3
 	github.com/smartystreets/goconvey v1.8.1
 )
 

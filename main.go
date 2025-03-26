@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "github.com/sena_2824182/pija_music_mid/routers"
+	_ "github.com/sena_2824182/pija_music_mid/controllers"
 
-	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego"
 )
 
 func main() {

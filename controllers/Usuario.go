@@ -1,22 +1,15 @@
 package controllers
 
 import (
-	"github.com/sena_2824182/pija_music_mid/models"
 	"encoding/json"
-
+	"fmt"
+	"github.com/sena_2824182/pija_music_mid/models"
 	"github.com/astaxie/beego"
 )
 
-// Operations about Users
-type USUARIO struct {
-	id                 int    `orm:"column(ID);pk"`
-	nombre             string `orm:"column(Nombre);pk"`
-	aprllido           string `orm:"column(Apellido);pk"`
-	fecha_creacion     int    `orm:"column(Fecha_Creacion);pk"`
-	feche_modificacion int    `orm:"column(Fecha_Modificacion);pk"`
-	activo             int    `orm:"column(Activo);"`
-
-	beego.USUARIO
+// Controller para usuarios
+type UsuarioController struct {
+	beego.Controller
 }
 
 // @Title CreateUser
@@ -25,53 +18,44 @@ type USUARIO struct {
 // @Success 200 {int} models.User.Id
 // @Failure 403 body is empty
 // @router / [post]
-func (u *USUARIOController) Post() {
-	var id []map[string]interface{}
-	var nombre []byte
-	var apellido []byte
-	var activo []byte
-	fmt.Println("activo es cunaod la persona es conectada", activo)
-
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &nombre); err == nil {
-		jsonData, err := json.MarshalIndent(nombre, "", "")
-		if err != nil {
-			fmt.Println("error de convertir a json", err)
-		}
-		json_usuario := id[1]
-		fmt.Println("id:", json_usuario)
-
-		json_usuario_byte, _ := json.Marshal(json_usuario)
-
-		response_usuario := services.Metodo_post("services_post",json_usuario_byte)
-		apellido = response_usuario
-		fmt.Println("este producto es el respot de post",string (response_usuario)) 
-		fmt.Println("json de ingreo ",jsonData)
+func (u *UsuarioController) Post() {
+	var body_usuario map[string]interface{}
+	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &body_usuario); err != nil {
+		u.Data["json"] = map[string]string{"error": "Invalid input"}
+		u.ServeJSON()
+		return
 	}
-	var usario1 map[string]interface{}
-	json.Unmarshal(apellido,&usario1)
 
-	var body_usuario []map[string]interface{}
-	body_usuario = append(body_usuario, usario1["data"].(map[string]interface{}))
+	// Procesar el usuario
+	json_usuario_byte, err := json.Marshal(body_usuario)
+	if err != nil {
+		fmt.Println("Error al convertir a JSON:", err)
+		u.Data["json"] = map[string]string{"error": "Error al convertir a JSON"}
+		u.ServeJSON()
+		return
+	}
 
-	alerta.Cobe = "201",
-	alerta.Type = "Post"
+	response_usuario := services.Metodo_post("services_post", json_usuario_byte)
+	fmt.Println("Respuesta del POST:", string(response_usuario))
 
-	alerta.Body = body_usuario
+	var usuario_response map[string]interface{}
+	if err := json.Unmarshal(response_usuario, &usuario_response); err != nil {
+		fmt.Println("Error al procesar la respuesta:", err)
+		u.Data["json"] = map[string]string{"error": "Error al procesar la respuesta"}
+		u.ServeJSON()
+		return
+	}
 
-	c.Data["json"] = alerta
-
-	c.ServeJSON()
-
-
-	
+	u.Data["json"] = usuario_response
+	u.ServeJSON()
 }
 
 // @Title GetAll
 // @Description get all Users
 // @Success 200 {object} models.User
 // @router / [get]
-func (u *UserController) GetAll() {
-	users := models.GetAllUsers()
+func (u *UsuarioController) GetAll() {
+	users := models.GetAllUsuario()
 	u.Data["json"] = users
 	u.ServeJSON()
 }
@@ -82,15 +66,17 @@ func (u *UserController) GetAll() {
 // @Success 200 {object} models.User
 // @Failure 403 :uid is empty
 // @router /:uid [get]
-func (u *UserController) Get() {
-	uid := u.GetString(":uid")
+func (u *UsuarioController) Get() {
+	uid := u.Ctx.Input.Param(":uid")
 	if uid != "" {
-		user, err := models.GetUser(uid)
+		user, err := models.GetUsuario(uid)
 		if err != nil {
 			u.Data["json"] = err.Error()
 		} else {
 			u.Data["json"] = user
 		}
+	} else {
+		u.Data["json"] = map[string]string{"error": "User ID is required"}
 	}
 	u.ServeJSON()
 }
@@ -102,35 +88,39 @@ func (u *UserController) Get() {
 // @Success 200 {object} models.User
 // @Failure 403 :uid is not int
 // @router /:uid [put]
-func (u *UserController) Put() {
-	id_usuario := c.Ctx.Input.Param(":id_usuario")
+func (u *UsuarioController) Put() {
+	id_usuario := u.Ctx.Input.Param(":uid")
 	var body_usuario map[string]interface{}
-	var id_Creacion_Credenciales map[string]interface
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody,&body_usuario);err == nil{
-		fmt.Println("este es id del usuario",id_usuario)
-		fmt.Println("este es el body del usuario",body_usuario)
-		get_usuario,_:= services.Metodo_get("sevicio ",id_usuario)
-		fmt.Println("este es get del usuario",string(get_usuario))
-		json_usuario,_:=services.ProcesadorJson(get_usuario)
-		fmt.Println("este es el json",json_usuario)
 
-		nuevo_json:=map[string]interface{}{
-			"id":json_usuario["id"], 
-			"nombre":body_usuario["nombre"],
-			"ameil"body_usuario["ameil"],
-			"apellido"body_usuario["apellido"]
-		}
-		fmt.Println("este es el nuevo json",nuevo_json)
+	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &body_usuario); err != nil {
+		u.Data["json"] = map[string]string{"error": "Invalid input"}
+		u.ServeJSON()
+		return
+	}
 
-		json_byte,_:=json.Marshal(nuevo_json)
-		response_put,_:= services.Metodo_put("servicio",id_usuario,json_byte)
-		fmt.Println("este es el response del put", string(response_put))
-		response,_:=services.ProcesadorJson(response_put)
+	// Obtener el usuario actual
+	get_usuario, _ := services.Metodo_get("servicio", id_usuario)
+	fmt.Println("Usuario obtenido:", string(get_usuario))
 
-		c.Data["json"]
+	json_usuario, _ := services.ProcesadorJson(get_usuario)
+	fmt.Println("JSON del usuario:", json_usuario)
 
-	} 
+	// Construir nuevo JSON
+	nuevo_json := map[string]interface{}{
+		"id":       json_usuario["id"],
+		"nombre":   body_usuario["nombre"],
+		"email":    body_usuario["email"],
+		"apellido": body_usuario["apellido"],
+	}
+	fmt.Println("Nuevo JSON:", nuevo_json)
 
+	// Actualizar usuario
+	json_byte, _ := json.Marshal(nuevo_json)
+	response_put, _ := services.Metodo_put("servicio", id_usuario, json_byte)
+	fmt.Println("Respuesta del PUT:", string(response_put))
+
+	u.Data["json"] = response_put
+	u.ServeJSON()
 }
 
 // @Title Delete
@@ -139,21 +129,21 @@ func (u *UserController) Put() {
 // @Success 200 {string} delete success!
 // @Failure 403 uid is empty
 // @router /:uid [delete]
-func (u *UserController) Delete() {
-	uid := u.GetString(":uid")
-	models.DeleteUser(uid)
+func (u *UsuarioController) Delete() {
+	uid := u.Ctx.Input.Param(":uid")
+	models.DeleteUsuario(uid)
 	u.Data["json"] = "delete success!"
 	u.ServeJSON()
 }
 
 // @Title Login
 // @Description Logs user into the system
-// @Param	username		query 	string	true		"The username for login"
+// @Param	Usuarioname		query 	string	true		"The username for login"
 // @Param	password		query 	string	true		"The password for login"
 // @Success 200 {string} login success
 // @Failure 403 user not exist
 // @router /login [get]
-func (u *UserController) Login() {
+func (u *UsuarioController) Login() {
 	username := u.GetString("username")
 	password := u.GetString("password")
 	if models.Login(username, password) {
@@ -164,11 +154,11 @@ func (u *UserController) Login() {
 	u.ServeJSON()
 }
 
-// @Title logout
+// @Title Logout
 // @Description Logs out current logged in user session
 // @Success 200 {string} logout success
 // @router /logout [get]
-func (u *UserController) Logout() {
+func (u *UsuarioController) Logout() {
 	u.Data["json"] = "logout success"
 	u.ServeJSON()
 }
