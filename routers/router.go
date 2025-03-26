@@ -30,6 +30,11 @@ func init() {
 			&controllers.ArtistaController{},
 		),
 	),
+		beego.NSNamespace("/Administrador",
+			beego.NSInclude(
+				&controllers.AdministradorController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
