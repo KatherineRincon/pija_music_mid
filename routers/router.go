@@ -52,7 +52,7 @@ func init() {
 
 		beego.NSNamespace("/Trajes_tipicos",
 			beego.NSInclude(
-				&controllers.AdministradorController{},
+				&controllers.Trajes_tipicosController{},
 			),
 		),
 	beego.AddNamespace(ns)
