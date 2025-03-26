@@ -53,14 +53,10 @@ func Metodo_post(nombre_servicio string, data []byte) ([]byte, error) {
 	return body, nil
 }
 
-func ProcesarJson(datos []byte) (map[string]interface{}, error) {
+func ProcesadorJson(data []byte) (map[string]interface{}, error) {
 	var result map[string]interface{}
-	err5 := json.Unmarshal(datos, &result)
-	if err5 != nil {
-		log.Fatal(err5)
-		return nil, err5
-	}
-	return result, nil
+	err := json.Unmarshal(data, &result)
+	return result, err
 }
 
 func Metodo_put(nombre_servicio string, id string, data []byte) ([]byte, error) {
