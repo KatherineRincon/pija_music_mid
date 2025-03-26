@@ -3,8 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sena_2824182/pija_music_mid/models"
+
 	"github.com/astaxie/beego"
+	"github.com/sena_2824182/pija_music_mid/models"
+	"github.com/sena_2824182/pija_music_mid/services"
 )
 
 // Controller para usuarios
@@ -29,18 +31,21 @@ func (u *UsuarioController) Post() {
 	// Procesar el usuario
 	json_usuario_byte, err := json.Marshal(body_usuario)
 	if err != nil {
-		fmt.Println("Error al convertir a JSON:", err)
 		u.Data["json"] = map[string]string{"error": "Error al convertir a JSON"}
 		u.ServeJSON()
 		return
 	}
 
-	response_usuario := services.Metodo_post("services_post", json_usuario_byte)
+	response_usuario, err := services.Metodo_post("services_post", json_usuario_byte)
+	if err != nil {
+		u.Data["json"] = map[string]string{"error": "Error en el servicio POST"}
+		u.ServeJSON()
+		return
+	}
 	fmt.Println("Respuesta del POST:", string(response_usuario))
 
 	var usuario_response map[string]interface{}
 	if err := json.Unmarshal(response_usuario, &usuario_response); err != nil {
-		fmt.Println("Error al procesar la respuesta:", err)
 		u.Data["json"] = map[string]string{"error": "Error al procesar la respuesta"}
 		u.ServeJSON()
 		return
@@ -55,10 +60,17 @@ func (u *UsuarioController) Post() {
 // @Success 200 {object} models.User
 // @router / [get]
 func (u *UsuarioController) GetAll() {
-	users := models.GetAllUsuario()
-	u.Data["json"] = users
+	users := models.GetAllUsuario() // Corregido: ahora solo recibe un valor
+
+	if len(users) == 0 { // Verifica si la lista está vacía
+		u.Data["json"] = map[string]string{"error": "No hay usuarios registrados"}
+	} else {
+		u.Data["json"] = users
+	}
+
 	u.ServeJSON()
 }
+
 
 // @Title Get
 // @Description get user by uid
@@ -71,7 +83,7 @@ func (u *UsuarioController) Get() {
 	if uid != "" {
 		user, err := models.GetUsuario(uid)
 		if err != nil {
-			u.Data["json"] = err.Error()
+			u.Data["json"] = map[string]string{"error": "Error al obtener usuario"}
 		} else {
 			u.Data["json"] = user
 		}
@@ -99,27 +111,51 @@ func (u *UsuarioController) Put() {
 	}
 
 	// Obtener el usuario actual
-	get_usuario, _ := services.Metodo_get("servicio", id_usuario)
+	get_usuario, err := services.Metodo_get("servicio", id_usuario)
+	if err != nil {
+		u.Data["json"] = map[string]string{"error": "Error al obtener usuario"}
+		u.ServeJSON()
+		return
+	}
 	fmt.Println("Usuario obtenido:", string(get_usuario))
 
-	json_usuario, _ := services.ProcesadorJson(get_usuario)
+	json_usuario, err := services.ProcesadorJson(get_usuario)
+	if err != nil {
+		u.Data["json"] = map[string]string{"error": "Error al procesar usuario"}
+		u.ServeJSON()
+		return
+	}
 	fmt.Println("JSON del usuario:", json_usuario)
 
 	// Construir nuevo JSON
-	nuevo_json := map[string]interface{}{
-		"id":       json_usuario["id"],
-		"nombre":   body_usuario["nombre"],
-		"email":    body_usuario["email"],
-		"apellido": body_usuario["apellido"],
+	usuarioActualizado := models.Usuario{
+		ID:       id_usuario,
+		Nombre:   fmt.Sprintf("%v", body_usuario["nombre"]),
+		Correo:   fmt.Sprintf("%v", body_usuario["email"]),
+		Password: fmt.Sprintf("%v", body_usuario["password"]), // Asegúrate de validar esto
 	}
-	fmt.Println("Nuevo JSON:", nuevo_json)
+	
+	err = models.UpdateUsuario(id_usuario, usuarioActualizado)
+if err != nil {
+    u.Data["json"] = map[string]string{"error": "Error al actualizar usuario"}
+    u.ServeJSON()
+    return
+}
 
 	// Actualizar usuario
-	json_byte, _ := json.Marshal(nuevo_json)
-	response_put, _ := services.Metodo_put("servicio", id_usuario, json_byte)
-	fmt.Println("Respuesta del PUT:", string(response_put))
+	json_byte, err := json.Marshal(usuarioActualizado)
+	if err != nil {
+		u.Data["json"] = map[string]string{"error": "Error al convertir a JSON"}
+		u.ServeJSON()
+		return
+	}
 
-	u.Data["json"] = response_put
+	response_put, err := services.Metodo_put("servicio", id_usuario, json_byte)
+	if err != nil {
+		u.Data["json"] = map[string]string{"error": "Error al actualizar usuario"}
+	} else {
+		u.Data["json"] = string(response_put)
+	}
 	u.ServeJSON()
 }
 
@@ -131,21 +167,30 @@ func (u *UsuarioController) Put() {
 // @router /:uid [delete]
 func (u *UsuarioController) Delete() {
 	uid := u.Ctx.Input.Param(":uid")
-	models.DeleteUsuario(uid)
-	u.Data["json"] = "delete success!"
+	if uid == "" {
+		u.Data["json"] = map[string]string{"error": "User ID is required"}
+	} else {
+		err := models.DeleteUsuario(uid)
+		if err != nil {
+			u.Data["json"] = map[string]string{"error": "Error al eliminar usuario"}
+		} else {
+			u.Data["json"] = "delete success!"
+		}
+	}
 	u.ServeJSON()
 }
 
 // @Title Login
 // @Description Logs user into the system
-// @Param	Usuarioname		query 	string	true		"The username for login"
-// @Param	password		query 	string	true		"The password for login"
+// @Param	username	query 	string	true		"The username for login"
+// @Param	password	query 	string	true		"The password for login"
 // @Success 200 {string} login success
 // @Failure 403 user not exist
 // @router /login [get]
 func (u *UsuarioController) Login() {
 	username := u.GetString("username")
 	password := u.GetString("password")
+
 	if models.Login(username, password) {
 		u.Data["json"] = "login success"
 	} else {
@@ -153,6 +198,7 @@ func (u *UsuarioController) Login() {
 	}
 	u.ServeJSON()
 }
+
 
 // @Title Logout
 // @Description Logs out current logged in user session
