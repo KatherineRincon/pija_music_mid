@@ -71,7 +71,6 @@ func (u *UsuarioController) GetAll() {
 	u.ServeJSON()
 }
 
-
 // @Title Get
 // @Description get user by uid
 // @Param	uid		path 	string	true		"The key for staticblock"
@@ -134,13 +133,13 @@ func (u *UsuarioController) Put() {
 		Correo:   fmt.Sprintf("%v", body_usuario["email"]),
 		Password: fmt.Sprintf("%v", body_usuario["password"]), // Asegúrate de validar esto
 	}
-	
+
 	err = models.UpdateUsuario(id_usuario, usuarioActualizado)
-if err != nil {
-    u.Data["json"] = map[string]string{"error": "Error al actualizar usuario"}
-    u.ServeJSON()
-    return
-}
+	if err != nil {
+		u.Data["json"] = map[string]string{"error": "Error al actualizar usuario"}
+		u.ServeJSON()
+		return
+	}
 
 	// Actualizar usuario
 	json_byte, err := json.Marshal(usuarioActualizado)
@@ -198,7 +197,6 @@ func (u *UsuarioController) Login() {
 	}
 	u.ServeJSON()
 }
-
 
 // @Title Logout
 // @Description Logs out current logged in user session
