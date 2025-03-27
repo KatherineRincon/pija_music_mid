@@ -6,6 +6,7 @@ require (
 	github.com/astaxie/beego v1.12.3
 	github.com/smartystreets/goconvey v1.8.1
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
+	gorm.io/gorm v1.25.12
 )
 
 require (
@@ -15,6 +16,8 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
