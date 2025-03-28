@@ -31,8 +31,6 @@ func init() {
 			),
 		),
 	)
-
-	
 		beego.NSNamespace("/Cultura",
 			beego.NSInclude(
 				&controllers.AdministradorController{},
@@ -41,6 +39,11 @@ func init() {
 
 
 		beego.NSNamespace("/Trajes_tipicos",
+			beego.NSInclude(
+				&controllers.AdministradorController{},
+			),
+		),
+		beego.NSNamespace("/Comida",
 			beego.NSInclude(
 				&controllers.AdministradorController{},
 			),
