@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,8 +12,9 @@ import (
 	"github.com/astaxie/beego"
 )
 
-func Metodo_get(nombre_servicio, parametro string) ([]byte, error) {
-	url := beego.AppConfig.String(nombre_servicio) + parametro
+func Metodo_get(host, endpoint string) ([]byte, error) {
+	url := beego.AppConfig.String(host) + endpoint
+	//fmt.Println("Ruta Get", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -131,4 +133,23 @@ func Metodo_delete(nombre_servicio, endpoint, id string) ([]byte, error) {
 
 	fmt.Println("Respuesta de la API:", string(body))
 	return body, nil
+}
+func ConvertToSliceMap(input interface{}) ([]map[string]interface{}, error) {
+	// Intentamos convertir a []interface{}
+	rawSlice, ok := input.([]interface{})
+	if !ok {
+		return nil, errors.New("el input no es un slice de interface{}")
+	}
+
+	// Recorremos el slice y convertimos cada elemento a map[string]interface{}
+	var result []map[string]interface{}
+	for i, item := range rawSlice {
+		m, ok := item.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("el elemento en el índice %d no es map[string]interface{}", i)
+		}
+		result = append(result, m)
+	}
+
+	return result, nil
 }
