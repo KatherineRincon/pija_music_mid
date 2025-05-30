@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/astaxie/beego"
+	"github.com/sena_2824182/pija_music_mid/services"
 )
 
 // CancionesController operations for Canciones
@@ -56,6 +57,32 @@ func (c *CancionesController) GetOne() {
 // @router / [get]
 func (c *CancionesController) GetAll() {
 	fmt.Println("get all de canciones")
+
+	canciones_byte,_:= services.Metodo_get("host_api","Canciones?limit=0")
+	JsonCanciones,_:= services.ProcesarJson(canciones_byte)
+	fmt.Println("Json Canciones",JsonCanciones)
+
+	SoloCanciones:= JsonCanciones["Data"]
+
+
+
+
+
+
+
+
+
+
+
+	
+	c.Data["json"] = map[string]interface{}{
+			"Success": true,
+			"Status":  200,
+			"Message": "Consulta de Canciones",
+			"Data":    JsonCanciones,
+		}
+
+		c.ServeJSON()
 
 }
 

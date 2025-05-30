@@ -14,7 +14,7 @@ import (
 
 func Metodo_get(host, endpoint string) ([]byte, error) {
 	url := beego.AppConfig.String(host) + endpoint
-	//fmt.Println("Ruta Get", url)
+	fmt.Println("Ruta Get", url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
