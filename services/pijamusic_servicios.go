@@ -38,8 +38,8 @@ func ProcesarJsonArreglos(datos []byte) ([]map[string]interface{}, error) {
 	return result, nil
 }
 
-func Metodo_post(nombre_servicio string, data []byte) ([]byte, error) {
-	url := beego.AppConfig.String(nombre_servicio)
+func Metodo_post(hots_servicio, endpoint string, data []byte) ([]byte, error) {
+	url := beego.AppConfig.String(hots_servicio)+endpoint
 	response, err := http.Post(url, "application/json", bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
@@ -132,3 +132,53 @@ func Metodo_delete(nombre_servicio, endpoint, id string) ([]byte, error) {
 	fmt.Println("Respuesta de la API:", string(body))
 	return body, nil
 }
+
+func MetodoGetQuery(api string, modelo string, query string) ([]byte, error) {
+	// Aquí puedes definir las URL base por API
+	var baseUrl string
+	switch api {
+	case "hots_crud":
+		baseUrl = "http://localhost:8080/v1"  // <-- Cambia por tu URL real
+	default:
+		return nil, fmt.Errorf("API desconocida: %s", api)
+	}
+
+	// Construir la URL completa
+	url := fmt.Sprintf("%s/%s/%s", baseUrl, modelo, query)
+
+	// Hacer la petición GET
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Leer la respuesta
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
+}
+
+// ConvertToSliceOfMaps convierte un interface{} a []map[string]interface{}
+func ConvertToSliceOfMaps(data interface{}) ([]map[string]interface{}, error) {
+    rawSlice, ok := data.([]interface{})
+    if !ok {
+        return nil, fmt.Errorf("el valor no es del tipo []interface{}")
+    }
+
+    result := make([]map[string]interface{}, 0, len(rawSlice))
+
+    for i, item := range rawSlice {
+        itemMap, ok := item.(map[string]interface{})
+        if !ok {
+            return nil, fmt.Errorf("el elemento en la posición %d no es map[string]interface{}", i)
+        }
+        result = append(result, itemMap)
+    }
+
+    return result, nil
+}
+
