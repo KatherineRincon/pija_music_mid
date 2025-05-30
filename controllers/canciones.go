@@ -94,8 +94,10 @@ func (c *CancionesController) GetOne() {
 func (c *CancionesController) GetAll() {
 	fmt.Println("get all de canciones")
 
-	var json_arreglado map[string]interface{}
+	//var json_arreglado map[string]interface{}
 	//var Json_total_areglado []map[string]interface{}
+	var arreglo_canciones_temporal []map[string]interface{}
+	var json_cancion_temporal map[string]interface{}
 
 	canciones_byte, _ := services.Metodo_get("host_api", "Canciones?limit=0")
 	JsonCanciones, _ := services.ProcesarJson(canciones_byte)
@@ -131,13 +133,19 @@ func (c *CancionesController) GetAll() {
 			// Mostrar título y álbum
 			fmt.Printf("  Titulo: %s, Album: %s\n", cancion["TituloCancion"], cancion["Album"])
 
-			json_arreglado = map[string]interface{}{
-			"nombre":nombreArtistico,
-			"imagen":  cancion["IdArtistas"].(map[string]interface{})["ImagenVideo"],
-			"canciones": []map[string]interface{}{
+			json_cancion_temporal= map[string]interface{}{
+				"nombre":cancion["TituloCancion"],
+				"duracion":cancion["Duracion"],
+				"videoUrl":cancion["RutaArchivo"],
+			}
+			arreglo_canciones_temporal= append(arreglo_canciones_temporal, json_cancion_temporal)
+			
 
-			},
-		}
+		// 	json_arreglado = map[string]interface{}{
+		// 	"nombre":nombreArtistico,
+		// 	"imagen":  cancion["IdArtistas"].(map[string]interface{})["ImagenVideo"],
+		// 	"canciones": "",
+		// }
 		
 		}
 	}
@@ -154,7 +162,7 @@ func (c *CancionesController) GetAll() {
 		"Success": true,
 		"Status":  200, 
 		"Message": "Consulta de Canciones",
-		"Data":    json_arreglado,
+		"Data":    arreglo_canciones_temporal,
 	}
 
 	c.ServeJSON()
