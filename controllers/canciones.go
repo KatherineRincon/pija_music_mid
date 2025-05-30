@@ -12,6 +12,42 @@ type CancionesController struct {
 	beego.Controller
 }
 
+type IdArtista struct {
+	Activo            bool   `json:"Activo"`
+	Biografia         string `json:"Biografia"`
+	FechaCreacion     string `json:"FechaCreacion"`
+	FechaModificacion string `json:"FechaModificacion"`
+	Id                int    `json:"Id"`
+	ImagenVideo       string `json:"ImagenVideo"`
+	NombreArtistico   string `json:"NombreArtistico"`
+	NombreReal        string `json:"NombreReal"`
+	RedesSociales     string `json:"RedesSociales"`
+}
+
+type IdEstilo struct {
+	Activo                  bool   `json:"Activo"`
+	DescripcionMusical      string `json:"DescripcionMusical"`
+	FechaCreacion           string `json:"FechaCreacion"`
+	FechaModificacion       string `json:"FechaModificacion"`
+	Id                      int    `json:"Id"`
+	InstrumentosPrincipales string `json:"InstrumentosPrincipales"`
+	NombreGenero            string `json:"NombreGenero"`
+}
+
+type Cancion struct {
+	Activo            bool      `json:"Activo"`
+	Album             string    `json:"Album"`
+	Duracion          string    `json:"Duracion"`
+	FechaCreacion     string    `json:"FechaCreacion"`
+	FechaLanzamiento  string    `json:"FechaLanzamiento"`
+	FechaModificacion string    `json:"FechaModificacion"`
+	Id                int       `json:"Id"`
+	IdArtistas        IdArtista `json:"IdArtistas"`
+	IdEstilo          IdEstilo  `json:"IdEstilo"`
+	RutaArchivo       string    `json:"RutaArchivo"`
+	TituloCancion     string    `json:"TituloCancion"`
+}
+
 // URLMapping ...
 func (c *CancionesController) URLMapping() {
 	c.Mapping("Post", c.Post)
@@ -58,31 +94,70 @@ func (c *CancionesController) GetOne() {
 func (c *CancionesController) GetAll() {
 	fmt.Println("get all de canciones")
 
-	canciones_byte,_:= services.Metodo_get("host_api","Canciones?limit=0")
-	JsonCanciones,_:= services.ProcesarJson(canciones_byte)
-	fmt.Println("Json Canciones",JsonCanciones)
+	var json_arreglado map[string]interface{}
+	//var Json_total_areglado []map[string]interface{}
 
-	SoloCanciones:= JsonCanciones["Data"]
+	canciones_byte, _ := services.Metodo_get("host_api", "Canciones?limit=0")
+	JsonCanciones, _ := services.ProcesarJson(canciones_byte)
+	//fmt.Println("Json Canciones",JsonCanciones)
 
+	SoloCanciones := JsonCanciones["Data"]
+	//fmt.Println("Solo Canciones", SoloCanciones)
 
+	Canciones_arreglo, _ := services.ConvertToSliceMap(SoloCanciones)
 
+	///////////////////////////////////////////////////////////////////////
 
+	grouped := make(map[string][]map[string]interface{})
 
-
-
-
-
-
-
-	
-	c.Data["json"] = map[string]interface{}{
-			"Success": true,
-			"Status":  200,
-			"Message": "Consulta de Canciones",
-			"Data":    JsonCanciones,
+	// Agrupar canciones
+	for _, cancion := range Canciones_arreglo {
+		// Obtener el NombreArtístico desde el campo IdArtistas.NombreArtistico
+		if idArtistas, ok := cancion["IdArtistas"].(map[string]interface{}); ok {
+			if nombreArtistico, ok := idArtistas["NombreArtistico"].(string); ok {
+				// Guardar la canción en el grupo correspondiente
+				grouped[nombreArtistico] = append(grouped[nombreArtistico], cancion)
+			}
 		}
+	}
 
-		c.ServeJSON()
+	fmt.Println("agrupacion de canciones", grouped)
+
+	// Mostrar las canciones agrupadas
+	for nombreArtistico, canciones := range grouped {
+		
+		fmt.Printf("Artista: %s\n", nombreArtistico)
+		for _, cancion := range canciones {
+			// Mostrar título y álbum
+			fmt.Printf("  Titulo: %s, Album: %s\n", cancion["TituloCancion"], cancion["Album"])
+
+			json_arreglado = map[string]interface{}{
+			"nombre":nombreArtistico,
+			"imagen":  cancion["IdArtistas"].(map[string]interface{})["ImagenVideo"],
+			"canciones": []map[string]interface{}{
+
+			},
+		}
+		
+		}
+	}
+
+
+	// for i, cancion := range Canciones_arreglo {
+
+	// 	fmt.Println("cancion numero", i)
+	// 	fmt.Println("Cancion", cancion)
+
+	// }
+
+	c.Data["json"] = map[string]interface{}{
+		"Success": true,
+		"Status":  200, 
+		"Message": "Consulta de Canciones",
+		"Data":    json_arreglado,
+	}
+
+	c.ServeJSON()
 
 }
 
