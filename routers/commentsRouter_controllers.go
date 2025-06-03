@@ -54,8 +54,8 @@ func init() {
 
     beego.GlobalControllerRouter["github.com/sena_2824182/pija_music_mid/controllers:AdministradorController"] = append(beego.GlobalControllerRouter["github.com/sena_2824182/pija_music_mid/controllers:AdministradorController"],
         beego.ControllerComments{
-            Method: "Postloginad",
-            Router: "/loginad",
+            Method: "Postlogin",
+            Router: "/login",
             AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
