@@ -94,8 +94,8 @@ func (c *CancionesController) GetOne() {
 func (c *CancionesController) GetAll() {
 	fmt.Println("get all de canciones")
 
-	//var json_arreglado map[string]interface{}
-	//var Json_total_areglado []map[string]interface{}
+	var json_arreglado map[string]interface{}
+	var Json_total_areglado []map[string]interface{}
 	var arreglo_canciones_temporal []map[string]interface{}
 	var json_cancion_temporal map[string]interface{}
 
@@ -140,29 +140,28 @@ func (c *CancionesController) GetAll() {
 			}
 			arreglo_canciones_temporal= append(arreglo_canciones_temporal, json_cancion_temporal)
 			
-
-		// 	json_arreglado = map[string]interface{}{
-		// 	"nombre":nombreArtistico,
-		// 	"imagen":  cancion["IdArtistas"].(map[string]interface{})["ImagenVideo"],
-		// 	"canciones": "",
-		// }
 		
+			json_arreglado = map[string]interface{}{
+			"nombre":nombreArtistico,
+			"imagen":  cancion["IdArtistas"].(map[string]interface{})["ImagenVideo"],
+			"canciones": arreglo_canciones_temporal,
 		}
+
+		
+	
+		}
+		
+		Json_total_areglado= append(Json_total_areglado,json_arreglado)
+		arreglo_canciones_temporal =nil
 	}
 
 
-	// for i, cancion := range Canciones_arreglo {
-
-	// 	fmt.Println("cancion numero", i)
-	// 	fmt.Println("Cancion", cancion)
-
-	// }
 
 	c.Data["json"] = map[string]interface{}{
 		"Success": true,
 		"Status":  200, 
 		"Message": "Consulta de Canciones",
-		"Data":    arreglo_canciones_temporal,
+		"Data":    Json_total_areglado,
 	}
 
 	c.ServeJSON()
