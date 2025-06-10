@@ -93,6 +93,6 @@ func init() {
 
 	beego.AddNamespace(ns)
 
-	// 🔧 Ruta personalizada para login de administrador
-	beego.Router("/v1/administrador/login", &controllers.AdministradorController{}, "post:Postlogin")
+
+	
 }

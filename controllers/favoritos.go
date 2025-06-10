@@ -5,7 +5,7 @@ import (
 
 	"github.com/astaxie/beego"
 
-	"github.com/sena_2824182/pija_music_mid/services"
+	
 )
 
 // FavoritosController operations for Favoritos
@@ -59,54 +59,6 @@ func (c *FavoritosController) GetOne() {
 func (c *FavoritosController) GetAll() {
 	fmt.Println("get all de favoritos")
 
-	// Obtener datos de favoritos desde el servicio
-	FavoritosByte, err := services.Metodo_get("host_api", "Favoritos?limit=0")
-	if err != nil {
-		c.Data["json"] = map[string]interface{}{
-			"Success": false,
-			"Status":  500,
-			"Message": "Error al consultar favoritos",
-			"Data":    nil,
-		}
-		c.ServeJSON()
-		return
-	}
-	
-
-	jsonFavoritos, _ := services.ProcesarJson(FavoritosByte)
-	soloFavoritos := jsonFavoritos["Data"]
-	favoritosArreglo, _ := services.ConvertToSliceMap(soloFavoritos)
-
-	var respuesta []map[string]interface{}
-
-	for _, favorito := range favoritosArreglo {
-		item := map[string]interface{}{}
-
-		if id, ok := favorito["Id"]; ok {
-			item["Id"] = id
-		}
-		if usuario, ok := favorito["IdUsuario"].(map[string]interface{}); ok {
-			item["IdUsuario"] = usuario["Id"]
-		}
-		if cancion, ok := favorito["IdCancion"].(map[string]interface{}); ok {
-			item["IdCancion"] = cancion["Id"]
-		}
-		if fecha, ok := favorito["FechaAgregado"]; ok {
-			item["FechaAgregado"] = fecha
-		}
-
-		respuesta = append(respuesta, item)
-	}
-
-	// Responder con el JSON final
-	c.Data["json"] = map[string]interface{}{
-		"Success": true,
-		"Status":  200,
-		"Message": "Consulta de Favoritos",
-		"Data":    respuesta,
-	}
-
-	c.ServeJSON()
 }
 
 // Put ...
