@@ -127,34 +127,30 @@ func (c *CancionesController) GetAll() {
 
 	// Mostrar las canciones agrupadas
 	for nombreArtistico, canciones := range grouped {
-		
-		fmt.Printf("Artista: %s\n", nombreArtistico)
-		for _, cancion := range canciones {
-			// Mostrar título y álbum
-			fmt.Printf("  Titulo: %s, Album: %s\n", cancion["TituloCancion"], cancion["Album"])
+    arreglo_canciones_temporal = nil
 
-			json_cancion_temporal= map[string]interface{}{
-				"nombre":cancion["TituloCancion"],
-				"duracion":cancion["Duracion"],
-				"videoUrl":cancion["RutaArchivo"],
-			}
-			arreglo_canciones_temporal= append(arreglo_canciones_temporal, json_cancion_temporal)
-			
-		
-			json_arreglado = map[string]interface{}{
-			"nombre":nombreArtistico,
-			"imagen":  cancion["IdArtistas"].(map[string]interface{})["ImagenVideo"],
-			"canciones": arreglo_canciones_temporal,
-		}
+    for _, cancion := range canciones {
+        fmt.Printf("  Titulo: %s, Album: %s\n", cancion["TituloCancion"], cancion["Album"])
 
-		
-	
-		}
-		
-		Json_total_areglado= append(Json_total_areglado,json_arreglado)
-		arreglo_canciones_temporal =nil
-	}
+        json_cancion_temporal = map[string]interface{}{
+            "IdCanciones": cancion["IdCanciones"],
+            "nombre":    cancion["TituloCancion"],
+            "duracion":  cancion["Duracion"],
+            "videoUrl":  cancion["RutaArchivo"],
+        }
 
+        arreglo_canciones_temporal = append(arreglo_canciones_temporal, json_cancion_temporal)
+    }
+
+    // ✅ Esta parte debe ir fuera del bucle de canciones
+    json_arreglado = map[string]interface{}{
+        "nombre":    nombreArtistico,
+        "imagen":    canciones[0]["IdArtistas"].(map[string]interface{})["ImagenVideo"],
+        "canciones": arreglo_canciones_temporal,
+    }
+
+    Json_total_areglado = append(Json_total_areglado, json_arreglado)
+}
 
 
 	c.Data["json"] = map[string]interface{}{
