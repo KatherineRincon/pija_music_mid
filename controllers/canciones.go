@@ -131,9 +131,10 @@ func (c *CancionesController) GetAll() {
 
     for _, cancion := range canciones {
         fmt.Printf("  Titulo: %s, Album: %s\n", cancion["TituloCancion"], cancion["Album"])
+		fmt.Println("es un print", cancion)
 
         json_cancion_temporal = map[string]interface{}{
-            "IdCanciones": cancion["IdCanciones"],
+            "IdCanciones": cancion["Id"],
             "nombre":    cancion["TituloCancion"],
             "duracion":  cancion["Duracion"],
             "videoUrl":  cancion["RutaArchivo"],
