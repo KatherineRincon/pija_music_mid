@@ -9,7 +9,6 @@ package routers
 
 import (
 	"github.com/sena_2824182/pija_music_mid/controllers"
-
 	"github.com/astaxie/beego"
 )
 
@@ -20,7 +19,7 @@ func init() {
 				&controllers.LugaresController{},
 			),
 		),
-        beego.NSNamespace("/artistas",
+		beego.NSNamespace("/artistas",
 			beego.NSInclude(
 				&controllers.ArtistasController{},
 			),
@@ -90,10 +89,10 @@ func init() {
 				&controllers.UsuarioController{},
 			),
 		),
-
-
 	)
+
 	beego.AddNamespace(ns)
 
-
+	// 🔧 Ruta personalizada para login de administrador
+	beego.Router("/v1/administrador/login", &controllers.AdministradorController{}, "post:Postlogin")
 }

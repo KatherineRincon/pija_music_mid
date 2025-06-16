@@ -682,4 +682,13 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/sena_2824182/pija_music_mid/controllers:UsuarioController"] = append(beego.GlobalControllerRouter["github.com/sena_2824182/pija_music_mid/controllers:UsuarioController"],
+        beego.ControllerComments{
+            Method: "Postlogin",
+            Router: "/login",
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
 }

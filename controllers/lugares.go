@@ -62,7 +62,6 @@ func (c *LugaresController) GetOne() {
 // @router / [get]
 func (c *LugaresController) GetAll() {
 
-
 	/// Vatriable generales
 	var lugares_organizados_totales map[string]interface{}
 	var lugares_organizados_senderismo []map[string]interface{}
@@ -148,7 +147,6 @@ func (c *LugaresController) GetAll() {
 	lugares_actividad_arreglo, _ := services.ConvertToSliceMap(lugares_actividad)
 	for _, lugar := range lugares_actividad_arreglo {
 
-
 		// Parte que saca el json de las imagenes en partes, ejemplo imagen, imagenes y fondo
 
 		imagenVideoStr, _ := lugar["ImagenVideo"].(string)
@@ -174,7 +172,6 @@ func (c *LugaresController) GetAll() {
 
 		descripcionJSON = strings.ReplaceAll(descripcionJSON, ",]", "]")
 
-
 		descripcionStr := strings.ReplaceAll(descripcionJSON, "\n", " ")
 
 		// 2. Parsear directamente
@@ -184,7 +181,6 @@ func (c *LugaresController) GetAll() {
 			fmt.Println("Error al parsear la descripción:", err)
 			return
 		}
-
 
 		lugares_actividad_temporal = map[string]interface{}{
 			"titulo":   lugar["NombreLugar"],
@@ -204,11 +200,10 @@ func (c *LugaresController) GetAll() {
 
 	}
 
-		//Inicia el flujo de Lugares historicos
+	//Inicia el flujo de Lugares historicos
 
 	body_lugares_historia_byte, _ := services.Metodo_get("host_api", "Lugares?limit=0&query=IdTipoLugares.Id:3")
 	body_lugares__historia_json, _ := services.ProcesarJson(body_lugares_historia_byte)
-
 
 	lugares_historia := body_lugares__historia_json["Data"]
 
@@ -241,9 +236,7 @@ func (c *LugaresController) GetAll() {
 		re := regexp.MustCompile(`([{,]\s*)(\w+)(\s*:)`)
 		descripcionJSON = re.ReplaceAllString(descripcionJSON, `$1"$2"$3`)
 
-
 		descripcionJSON = strings.ReplaceAll(descripcionJSON, ",]", "]")
-
 
 		descripcionStr := strings.ReplaceAll(descripcionJSON, "\n", " ")
 
@@ -254,7 +247,6 @@ func (c *LugaresController) GetAll() {
 			fmt.Println("Error al parsear la descripción:", err)
 			return
 		}
-
 
 		lugares_historicos_temporal = map[string]interface{}{
 			"titulo": lugar["NombreLugar"],
@@ -308,7 +300,7 @@ func (c *LugaresController) GetAll() {
 		descripcionJSON = strings.ReplaceAll(descripcionJSON, "'", "\"")
 
 		re := regexp.MustCompile(`([{,]\s*)(\w+)(\s*:)`)
-		
+
 		descripcionJSON = re.ReplaceAllString(descripcionJSON, `$1"$2"$3`)
 		descripcionJSON = strings.ReplaceAll(descripcionJSON, ",]", "]")
 		descripcionStr := strings.ReplaceAll(descripcionJSON, "\n", " ")
@@ -373,12 +365,10 @@ func (c *LugaresController) GetAll() {
 		descripcionJSON = strings.ReplaceAll(descripcionJSON, "'", "\"")
 
 		re := regexp.MustCompile(`([{,]\s*)(\w+)(\s*:)`)
-		
+
 		descripcionJSON = re.ReplaceAllString(descripcionJSON, `$1"$2"$3`)
 		descripcionJSON = strings.ReplaceAll(descripcionJSON, ",]", "]")
 		descripcionStr := strings.ReplaceAll(descripcionJSON, "\n", " ")
-	
-	
 
 		var descripcion []map[string]string
 		err = json.Unmarshal([]byte(descripcionStr), &descripcion)
@@ -408,14 +398,12 @@ func (c *LugaresController) GetAll() {
 	// Construcionm finsl
 
 	lugares_organizados_totales = map[string]interface{}{
-		"senderismo": lugares_organizados_senderismo,
+		"senderismo":         lugares_organizados_senderismo,
 		"actividad_familiar": lugares_organizados_actividad,
 		"lugares_historicos": lugares_organizados_historicos,
 		"eventos_culturales": lugares_organizados_culturales,
 		"restaurantes":       lugares_organizados_restaurante,
-
 	}
-
 
 	c.Data["json"] = map[string]interface{}{"Success": true,
 		"Status":  200,
